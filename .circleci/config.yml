@@ -1,0 +1,80 @@
+# Javascript Node CircleCI 2.0 configuration file
+#
+# Check https://circleci.com/docs/2.0/language-javascript/ for more details
+#
+version: 2
+jobs:
+  build:
+    docker:
+      # specify the version you desire here
+      - image: circleci/node:12.5.0
+
+      # Specify service dependencies here if necessary
+      # CircleCI maintains a library of pre-built images
+      # documented at https://circleci.com/docs/2.0/circleci-images/
+      # - image: circleci/mongo:3.4.4
+    working_directory: ~/repo
+
+    steps:
+      - checkout
+
+      # Download and cache dependencies
+      - restore_cache:
+          keys:
+            - v1-dependencies-{{ checksum "package.json" }}
+            # fallback to using the latest cache if no exact match is found
+            - v1-dependencies-
+
+      - run: yarn install
+
+      - save_cache:
+          paths:
+            - node_modules
+          key: v1-dependencies-{{ checksum "package.json" }}
+
+      # run lints!
+      - run: yarn lint
+
+      # run build
+      - run: yarn build
+
+      - persist_to_workspace:
+         root: .
+         paths: dist
+
+  # build job omitted for brevity
+  deploy:
+    docker:
+      - image: circleci/python:3.7-stretch
+
+    working_directory: ~/repo
+
+    steps:
+      - attach_workspace:
+          at: .
+
+      - run:
+          name: Install awscli
+          command: sudo pip install awscli
+      - run:
+          name: Configuration
+          command: aws configure set default.s3.signature_version s3v4
+
+      - run:
+          name: Deploy to Minio
+          command: aws --endpoint-url https://minio.ymzstudio.com s3 sync dist s3://static-pages/${CIRCLE_PROJECT_REPONAME}/${CIRCLE_BRANCH} --delete
+  
+workflows:
+  version: 2
+  build-deploy:
+    jobs:
+      - build
+      - deploy:
+          requires:
+            - build
+          filters:
+            branches:
+              only: 
+                - master
+                - release
+                - dev
