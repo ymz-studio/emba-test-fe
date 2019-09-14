@@ -7,6 +7,7 @@
     <div class="qrcode" v-if="token" v-show="!chartVisible">
       <h2>扫描二维码开始测试</h2>
       <canvas id="qrcode"></canvas>
+      <p>{{qrcodeUrl}}</p>
       <el-button type="text" @click="chartVisible = true">切换至统计界面</el-button>
     </div>
     <div class="chart" v-show="chartVisible">
@@ -33,16 +34,14 @@ export default class extends Vue {
   @Watch("token", { immediate: true }) async onTokenChange(val: string) {
     this.$nextTick(() => {
       if (val) {
-        Qrcode.toCanvas(
-          document.getElementById("qrcode"),
-          location.origin + "/#/" + "?token=" + val,
-          {
-            width: window.innerWidth > 600 ? 360 : 260
-          }
-        );
+        const qrcodeUrl = location.origin + "/#/" + "?token=" + val;
+        Qrcode.toCanvas(document.getElementById("qrcode"), qrcodeUrl, {
+          width: window.innerWidth > 600 ? 360 : 260
+        });
+        this.qrcodeUrl = qrcodeUrl;
       }
     });
-    const sse = new EventSource("/api/data/sse");
+    const sse = new EventSource("/api/admin/data/sse");
     sse.addEventListener("message", e => {
       this.data = JSON.parse(e.data);
     });
@@ -58,6 +57,7 @@ export default class extends Vue {
   stop = false;
   chart: any = null;
   data: any[] = [];
+  qrcodeUrl = "";
   sse: EventSource | null = null;
 
   created() {
@@ -87,18 +87,18 @@ export default class extends Vue {
 
   async getToken() {
     this.loading++;
-    const { data } = await axios.get("/api/token");
+    const { data } = await axios.get("/api/admin/token");
     this.token = data;
     this.loading--;
   }
 
   async getData() {
-    const { data } = await axios.get("/api/data");
+    const { data } = await axios.get("/api/admin/data");
     this.data = data;
   }
 
   async onStart() {
-    await axios.post("/api/start");
+    await axios.post("/api/admin/start");
     await this.getToken();
     if (this.stop) {
       this.chart.changeData([]);
@@ -112,13 +112,13 @@ export default class extends Vue {
       "停止后无法将继续本次测试",
       "确定停止吗?"
     );
-    await axios.post("/api/stop");
+    await axios.post("/api/admin/stop");
     this.stop = true;
   }
 
   async onExport() {
     const a = document.createElement("a");
-    a.href = "/api/export";
+    a.href = "/api/admin/export";
     a.click();
   }
 
