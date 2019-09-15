@@ -51,6 +51,10 @@ export default class extends Vue {
     sse.addEventListener("message", e => {
       this.data = JSON.parse(e.data);
     });
+    sse.addEventListener("error", async e => {
+      await this.$alert("事件已断开, 请刷新重试");
+      location.reload(true);
+    });
     this.sse = sse;
   }
   @Watch("data") onDataChange(val: any) {
@@ -87,7 +91,6 @@ export default class extends Vue {
     await axios.post("/api/admin/start");
     await this.getToken();
     if (this.stop) {
-      this.chart.changeData([]);
       this.chartVisible = false;
     }
     this.stop = false;
