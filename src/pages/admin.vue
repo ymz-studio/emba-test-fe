@@ -10,8 +10,8 @@
       <p>{{qrcodeUrl}}</p>
       <el-button type="text" @click="chartVisible = true">切换至统计界面</el-button>
     </div>
-    <div class="chart" v-show="chartVisible">
-      <canvas id="admin-chart"></canvas>
+    <div class="chart" v-if="chartVisible">
+      <chart legend class="chart-instance" :data="chartData"></chart>
       <el-button v-if="!stop" type="text" @click="chartVisible = false">查看二维码</el-button>
       <el-button v-if="stop" type="text" @click="onStart">重新发起测试</el-button>
       <el-button v-else type="text" @click="onStop">停止测试</el-button>
@@ -27,8 +27,14 @@ import F2 from "@antv/f2";
 
 //@ts-ignore
 import Qrcode from "qrcode/build/qrcode";
+
+import Chart from "@/components/Chart.vue";
+
 @Component({
-  layout: "empty"
+  layout: "empty",
+  components: {
+    Chart
+  }
 })
 export default class extends Vue {
   @Watch("token", { immediate: true }) async onTokenChange(val: string) {
@@ -47,10 +53,10 @@ export default class extends Vue {
     });
     this.sse = sse;
   }
-
-  @Watch("data") onDataChange(data: any) {
-    this.chart && this.chart.changeData(this.handleData(data));
+  @Watch("data") onDataChange(val: any) {
+    this.chartData = this.handleData(val);
   }
+
   token = "";
   loading = 0;
   chartVisible = false;
@@ -59,30 +65,10 @@ export default class extends Vue {
   data: any[] = [];
   qrcodeUrl = "";
   sse: EventSource | null = null;
-
-  created() {
-    this.getToken();
-    this.getData();
-  }
-
-  mounted() {
-    const chart = new F2.Chart({
-      id: "admin-chart",
-      pixelRatio: window.devicePixelRatio,
-      width: window.innerWidth > 600 ? 560 : 260,
-      height: 400
-    });
-    chart
-      .point({
-        startOnZero: true
-      })
-      .position("x*y")
-      .color("name")
-      .style({
-        fillOpacity: 0.65
-      });
-    chart.render();
-    this.chart = chart;
+  chartData: any = [];
+  async created() {
+    await this.getToken();
+    await this.getData();
   }
 
   async getToken() {
@@ -125,7 +111,7 @@ export default class extends Vue {
   handleData(data: any[]) {
     return data.map((item: any) => ({
       name: item.name,
-      x: parseInt(item.RO) - parseInt(item.AE),
+      x: parseInt(item.AE) - parseInt(item.RO),
       y: parseInt(item.AC) - parseInt(item.CE)
     }));
   }
@@ -153,5 +139,10 @@ h2 {
 }
 .chart {
   text-align: center;
+  width: 560px;
+  max-width: 100%;
+}
+.chart-instance {
+  margin-bottom: 20px;
 }
 </style>
