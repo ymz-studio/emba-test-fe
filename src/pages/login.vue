@@ -1,5 +1,6 @@
 <template>
   <div>
+    <h1>学习风格测试</h1>
     <el-card>
       <el-form :model="form">
         <el-form-item label="Username" prop="username">
@@ -52,5 +53,10 @@ export default class extends Vue {
 .submit {
   width: 100%;
   height: 50px;
+}
+h1 {
+  text-align: center;
+  color: #fff;
+  font-weight: 400;
 }
 </style>
