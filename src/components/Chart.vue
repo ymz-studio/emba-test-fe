@@ -72,7 +72,7 @@ export default class extends Vue {
         nameStyle: {
           fontSize: container.clientWidth * 0.05
         },
-        marker:{
+        marker: {
           radius: container.clientWidth * 0.01
         }
       }
@@ -81,7 +81,7 @@ export default class extends Vue {
       .point()
       .position("x*y")
       .color("name")
-      .size(5)
+      .size(container.clientWidth * 0.01)
       .animate({
         appear: {
           delay: 300
@@ -167,13 +167,19 @@ export default class extends Vue {
 <style lang="scss" scoped>
 .chart-container /deep/ {
   .chart-label {
-    font-size: 16px;
+    font-size: 20px;
     white-space: nowrap;
+    @media (max-width: 900px) {
+      font-size: 12px;
+    }
   }
   .placeholder {
     white-space: nowrap;
-    font-size: 19px;
+    font-size: 30px;
     color: red;
+    @media (max-width: 900px) {
+      font-size: 16px;
+    }
   }
 }
 </style>
