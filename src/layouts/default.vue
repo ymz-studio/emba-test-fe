@@ -7,7 +7,6 @@
 </template>
 <style lang="scss" scoped>
 .content {
-  min-height: 100vh;
   box-sizing: border-box;
   display: flex;
   flex-direction: column;
@@ -16,6 +15,8 @@
   flex: 1;
   display: flex;
   flex-direction: column;
+  box-shadow: none;
+  border: none;
 }
 .card /deep/ .el-card__body {
   flex: 1;

@@ -160,6 +160,7 @@ export default class extends Vue {
   }
   &.danger {
     color: #f56c6c;
+    margin-bottom: 20px;
   }
 }
 .el-button {
