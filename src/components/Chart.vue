@@ -50,7 +50,7 @@ export default class extends Vue {
       height: container.clientWidth,
       plugins: [Guide, Legend],
       appendPadding: 0,
-      padding: this.legend ? 40 : 20
+      padding: this.legend ? container.clientWidth * 0.05 + 40 : 20
     });
     chart.source(this.handleData(this.data), {
       x: {
