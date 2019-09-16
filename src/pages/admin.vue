@@ -26,9 +26,9 @@
     </div>
     <div class="card" v-if='data.length'>
       <el-row :gutter="50" type="flex" class="group-row">
-        <el-col :span="8" v-for="(item , k) in groupData" :key="k" class="group-col">
-          <h1>{{k}}</h1>
-          <chart :data="item" legend :name="k"></chart>
+        <el-col :span="6" v-for="k in 8" :key="k" class="group-col">
+          <h1>第 {{k}} 组</h1>
+          <chart :data="groupData[k]" legend :name="`group-${k}`"></chart>
         </el-col>
       </el-row>
     </div>
@@ -57,7 +57,7 @@ export default class extends Vue {
       if (val) {
         const qrcodeUrl = location.origin + "/#/" + "?token=" + val;
         Qrcode.toCanvas(document.getElementById("qrcode"), qrcodeUrl, {
-          width: window.innerWidth > 600 ? 460 : 260
+          width: window.innerWidth > 600 ? 360 : 260
         });
         this.qrcodeUrl = qrcodeUrl;
       }
@@ -146,7 +146,7 @@ export default class extends Vue {
 
   handleData(data: any[]) {
     return data.map((item: any) => ({
-      name: item.name,
+      name: item.group,
       x: parseInt(item.AE) - parseInt(item.RO),
       y: parseInt(item.AC) - parseInt(item.CE)
     }));

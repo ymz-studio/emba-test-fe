@@ -184,7 +184,7 @@ export default class extends Vue {
   }
   .placeholder {
     white-space: nowrap;
-    font-size: 25px;
+    font-size: 18px;
     color: red;
     @media (max-width: 900px) {
       font-size: 16px;
