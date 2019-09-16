@@ -14,7 +14,9 @@
     </p>
     <p>
       请完善您的信息
-      <el-input class="input" v-model="group" placeholder="请输入你的组别"></el-input>
+      <el-select class="input" v-model="group" placeholder="请选择你的组别">
+        <el-option v-for="item in 8" :key="item" :value="`第 ${item} 组`"></el-option>
+      </el-select>
       <el-input class="input" v-model="name" placeholder="请输入你的姓名"></el-input>
     </p>
     <p class="tip">
@@ -59,6 +61,7 @@ p + p {
 
 .input {
   margin-top: 10px;
+  display: block;
 }
 .tip {
   margin-top: 20px;

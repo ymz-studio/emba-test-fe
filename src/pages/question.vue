@@ -155,7 +155,6 @@ export default class extends Vue {
 .tip {
   margin: 0;
   text-align: center;
-  font-size: 12px;
   &.success {
     color: #67c23a;
   }

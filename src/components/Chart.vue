@@ -1,6 +1,6 @@
 <template>
   <div class="chart-container" ref="container">
-    <canvas id="chart"></canvas>
+    <canvas :id='name'></canvas>
   </div>
 </template>
 <script lang="ts">
@@ -25,7 +25,16 @@ export default class extends Vue {
   })
   legend!: boolean;
 
-  @Watch("data") onDataChange(val: any) {
+  @Prop({
+    type: String,
+    default: Math.random()
+      .toString(36)
+      .slice(-8)
+  })
+  name!: string;
+
+  @Watch("data")
+  onDataChange(val: any) {
     if (this.chart) {
       this.chart.changeData(this.handleData(val));
     }
@@ -44,7 +53,7 @@ export default class extends Vue {
     const container = this.$refs.container as Element;
 
     const chart = new F2.Chart({
-      id: "chart",
+      id: this.name,
       pixelRatio: window.devicePixelRatio,
       width: container.clientWidth,
       height: container.clientWidth,
@@ -140,22 +149,22 @@ export default class extends Vue {
     });
     // 四象限文字
     chart.guide().html({
-      position: [-32, -26],
+      position: [-32, 'min'],
       html: '<div class="placeholder">归纳型:推论实干型</div>',
       alignX: "center"
     });
     chart.guide().html({
-      position: [-32, 15],
+      position: [-32, 'max'],
       html: '<div class="placeholder">适应型:经验实干型</div>',
       alignX: "center"
     });
     chart.guide().html({
-      position: [20, 15],
+      position: [20, 'max'],
       html: '<div class="placeholder">散发型:经验观察型</div>',
       alignX: "center"
     });
     chart.guide().html({
-      position: [20, -26],
+      position: [20, 'min'],
       html: '<div class="placeholder">消化型:推论观察型</div>',
       alignX: "center"
     });
@@ -175,7 +184,7 @@ export default class extends Vue {
   }
   .placeholder {
     white-space: nowrap;
-    font-size: 30px;
+    font-size: 25px;
     color: red;
     @media (max-width: 900px) {
       font-size: 16px;

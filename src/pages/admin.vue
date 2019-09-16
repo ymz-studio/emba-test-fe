@@ -1,23 +1,38 @@
 <template>
-  <el-card ref="card" class="card" v-loading="loading">
-    <div class="start" @click="onStart" v-if="!token">
-      <img src="@/assets/qrcode.svg" />
-      <h2>点击开始测试</h2>
+  <div class="container">
+    <div ref="card" class="card" v-loading="loading">
+      <div class="start" @click="onStart" v-if="!token">
+        <img src="@/assets/qrcode.svg" />
+        <h2>点击开始测试</h2>
+      </div>
+      <div v-else>
+        <h1>
+          学习风格测试结果 共完成
+          <strong> {{data.length}} </strong>人
+        </h1>
+        <el-row type="flex" justify="space-around">
+          <div class="qrcode">
+            <canvas id="qrcode"></canvas>
+            <p>{{qrcodeUrl}}</p>
+            <el-button v-if="stop" type="text" @click="onStart">重新发起测试</el-button>
+            <el-button v-else type="text" @click="onStop">停止测试</el-button>
+            <el-button type="text" @click="onExport">导出EXCEL</el-button>
+          </div>
+          <div class="chart" v-if='chartData && chartData.length'>
+            <chart :data="chartData" name='chart'></chart>
+          </div>
+        </el-row>
+      </div>
     </div>
-    <div class="qrcode" v-if="token" v-show="!chartVisible">
-      <h2>扫描二维码开始测试</h2>
-      <canvas id="qrcode"></canvas>
-      <p>{{qrcodeUrl}}</p>
-      <el-button type="text" @click="chartVisible = true">切换至统计界面</el-button>
+    <div class="card" v-if='data.length'>
+      <el-row :gutter="50" type="flex" class="group-row">
+        <el-col :span="8" v-for="(item , k) in groupData" :key="k" class="group-col">
+          <h1>{{k}}</h1>
+          <chart :data="item" legend :name="k"></chart>
+        </el-col>
+      </el-row>
     </div>
-    <div class="chart" v-if="chartVisible">
-      <chart legend class="chart-instance" :data="chartData"></chart>
-      <el-button v-if="!stop" type="text" @click="chartVisible = false">查看二维码</el-button>
-      <el-button v-if="stop" type="text" @click="onStart">重新发起测试</el-button>
-      <el-button v-else type="text" @click="onStop">停止测试</el-button>
-      <el-button type="text" @click="onExport">导出EXCEL</el-button>
-    </div>
-  </el-card>
+  </div>
 </template>
 <script lang="ts">
 import { Vue, Component, Watch } from "vue-property-decorator";
@@ -49,19 +64,35 @@ export default class extends Vue {
       this.listen();
     });
   }
-  @Watch("data") onDataChange(val: any) {
-    this.chartData = this.handleData(val);
-  }
 
   token = "";
   loading = 0;
-  chartVisible = false;
   stop = false;
   chart: any = null;
   data: any[] = [];
   qrcodeUrl = "";
   sse: EventSource | null = null;
-  chartData: any = [];
+
+  get groupData() {
+    let map: any = {};
+    this.data.forEach(item => {
+      if (!map[item.group]) {
+        map[item.group] = [];
+      }
+      map[item.group].push({
+        name: item.name,
+        group: item.group,
+        x: parseInt(item.AE) - parseInt(item.RO),
+        y: parseInt(item.AC) - parseInt(item.CE)
+      });
+    });
+    return map;
+  }
+
+  get chartData() {
+    return this.handleData(this.data);
+  }
+
   async created() {
     await this.getToken();
     await this.getData();
@@ -94,9 +125,7 @@ export default class extends Vue {
   async onStart() {
     await axios.post("/api/admin/start");
     await this.getToken();
-    if (this.stop) {
-      this.chartVisible = false;
-    }
+    this.data = []
     this.stop = false;
   }
 
@@ -129,9 +158,15 @@ export default class extends Vue {
 }
 </script>
 <style lang="scss" scoped>
+.container {
+  background: #fff;
+  overflow: auto;
+}
 .card {
-  max-width: min-content;
-  margin: 0 auto;
+  min-height: 100vh;
+  background: #fff;
+  box-sizing: border-box;
+  text-align: center;
 }
 h2 {
   text-align: center;
@@ -151,5 +186,20 @@ h2 {
 }
 .chart-instance {
   margin-bottom: 20px;
+}
+h1 {
+  font-weight: 400;
+  strong {
+    color: #e6a23c;
+  }
+  text-align: center;
+}
+.group-col {
+  border: 1px solid #bcbcbc;
+}
+.group-row {
+  flex-wrap: wrap;
+  max-width: 100%;
+  padding-left: 50px;
 }
 </style>
