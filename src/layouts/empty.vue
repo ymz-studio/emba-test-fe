@@ -1,6 +1,6 @@
 <template>
   <div class="body">
-    <h1>EMBA TEST</h1>
+    <h1>学习风格测试</h1>
     <router-view></router-view>
   </div>
 </template>
@@ -16,6 +16,6 @@ h1 {
   color: #fff;
   font-weight: 300;
   text-align: center;
-  margin: 60px 0;
+  margin: 20px 0;
 }
 </style>

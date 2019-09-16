@@ -81,6 +81,7 @@ export default class extends Vue {
         "/api/complete",
         {
           name: this.$route.query.name,
+          group: this.$route.query.group,
           ...result
         },
         {

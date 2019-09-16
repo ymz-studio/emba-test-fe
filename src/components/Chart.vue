@@ -27,8 +27,17 @@ export default class extends Vue {
 
   @Watch("data") onDataChange(val: any) {
     if (this.chart) {
-      this.chart.changeData(val);
+      this.chart.changeData(this.handleData(val));
     }
+  }
+
+  handleData(data: any) {
+    console.log(data);
+    return data.map((item: any) => ({
+      name: item.name,
+      x: -item.x,
+      y: -item.y
+    }));
   }
 
   mounted() {
@@ -39,24 +48,33 @@ export default class extends Vue {
       pixelRatio: window.devicePixelRatio,
       width: container.clientWidth,
       height: container.clientWidth,
-      plugins: [Guide, Legend]
+      plugins: [Guide, Legend],
+      appendPadding: 0,
+      padding: this.legend ? 40 : 20
     });
-    chart.source(this.data, {
+    chart.source(this.handleData(this.data), {
       x: {
-        min: -42,
-        max: 48
+        min: -48,
+        max: 36
       },
       y: {
-        min: -42,
-        max: 48
+        min: -48,
+        max: 36
       }
     });
     chart.axis("x", false);
     chart.axis("y", false);
     chart.legend(
+      "name",
       this.legend && {
         align: "left",
-        itemWidth: null // 图例项按照实际宽度渲染
+        itemWidth: null, // 图例项按照实际宽度渲染,
+        nameStyle: {
+          fontSize: container.clientWidth * 0.05
+        },
+        marker:{
+          radius: container.clientWidth * 0.01
+        }
       }
     );
     chart
@@ -70,15 +88,15 @@ export default class extends Vue {
         }
       });
     chart.guide().line({
-      start: ["min", 6],
-      end: ["max", 6],
+      start: ["min", -6],
+      end: ["max", -6],
       style: {
         lineDash: [5, 10]
       }
     });
     chart.guide().line({
-      start: ["min", 6],
-      end: ["max", 6],
+      start: ["min", -6],
+      end: ["max", -6],
       style: {
         lineWidth: 12,
         opacity: 0.2
@@ -86,58 +104,58 @@ export default class extends Vue {
     });
 
     chart.guide().line({
-      start: [6, "min"],
-      end: [6, "max"],
+      start: [-6, "min"],
+      end: [-6, "max"],
       style: {
         lineDash: [5, 10]
       }
     });
     chart.guide().line({
-      start: [6, "min"],
-      end: [6, "max"],
+      start: [-6, "min"],
+      end: [-6, "max"],
       style: {
         lineWidth: 12,
         opacity: 0.2
       }
     });
     chart.guide().html({
-      position: ["max", 6],
-      html: '<div class="chart-label">主动<br>体验</div>',
-      alignX: "center"
-    });
-    chart.guide().html({
-      position: [6, "min"],
-      html: '<div class="chart-label">具体<br>经验</div>',
-      alignX: "center"
-    });
-    chart.guide().html({
-      position: ["min", 6],
+      position: ["max", -6],
       html: '<div class="chart-label">静思<br>观察</div>',
       alignX: "center"
     });
     chart.guide().html({
-      position: [6, "max"],
+      position: [-6, "min"],
       html: '<div class="chart-label">抽象<br>概念</div>',
+      alignX: "center"
+    });
+    chart.guide().html({
+      position: ["min", -6],
+      html: '<div class="chart-label">主动<br>体验</div>',
+      alignX: "center"
+    });
+    chart.guide().html({
+      position: [-6, "max"],
+      html: '<div class="chart-label">具体<br>经验</div>',
       alignX: "center"
     });
     // 四象限文字
     chart.guide().html({
-      position: [32, 26],
+      position: [-32, -26],
       html: '<div class="placeholder">归纳型:推论实干型</div>',
       alignX: "center"
     });
     chart.guide().html({
-      position: [32, -15],
+      position: [-32, 15],
       html: '<div class="placeholder">适应型:经验实干型</div>',
       alignX: "center"
     });
     chart.guide().html({
-      position: [-20, -15],
+      position: [20, 15],
       html: '<div class="placeholder">散发型:经验观察型</div>',
       alignX: "center"
     });
     chart.guide().html({
-      position: [-20, 26],
+      position: [20, -26],
       html: '<div class="placeholder">消化型:推论观察型</div>',
       alignX: "center"
     });
@@ -149,14 +167,13 @@ export default class extends Vue {
 <style lang="scss" scoped>
 .chart-container /deep/ {
   .chart-label {
-    font-size: 12px;
+    font-size: 16px;
     white-space: nowrap;
-    background: #fff;
   }
   .placeholder {
     white-space: nowrap;
-    background: #fff;
-    color: #f1a312;
+    font-size: 19px;
+    color: red;
   }
 }
 </style>

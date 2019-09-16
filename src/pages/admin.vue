@@ -42,20 +42,12 @@ export default class extends Vue {
       if (val) {
         const qrcodeUrl = location.origin + "/#/" + "?token=" + val;
         Qrcode.toCanvas(document.getElementById("qrcode"), qrcodeUrl, {
-          width: window.innerWidth > 600 ? 360 : 260
+          width: window.innerWidth > 600 ? 460 : 260
         });
         this.qrcodeUrl = qrcodeUrl;
       }
+      this.listen();
     });
-    const sse = new EventSource("/api/admin/data/sse");
-    sse.addEventListener("message", e => {
-      this.data = JSON.parse(e.data);
-    });
-    sse.addEventListener("error", async e => {
-      await this.$alert("事件已断开, 请刷新重试");
-      location.reload(true);
-    });
-    this.sse = sse;
   }
   @Watch("data") onDataChange(val: any) {
     this.chartData = this.handleData(val);
@@ -73,6 +65,18 @@ export default class extends Vue {
   async created() {
     await this.getToken();
     await this.getData();
+  }
+
+  async listen() {
+    const sse = new EventSource("/api/admin/data/sse");
+    sse.addEventListener("message", e => {
+      this.data = JSON.parse(e.data);
+    });
+    sse.addEventListener("error", async e => {
+      sse.close();
+      this.listen();
+    });
+    this.sse = sse;
   }
 
   async getToken() {
@@ -142,7 +146,7 @@ h2 {
 }
 .chart {
   text-align: center;
-  width: 560px;
+  width: 740px;
   max-width: 100%;
 }
 .chart-instance {
