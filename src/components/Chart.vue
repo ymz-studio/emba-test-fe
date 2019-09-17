@@ -178,8 +178,8 @@ export default class extends Vue {
       position: [-32, "min"],
       content: "归纳型:推论实干型",
       style: {
-        fill: "red",
-        fontSize: container.clientWidth * 0.05
+        fill: "#4d73be",
+        fontSize: container.clientWidth * 0.04
       }
     });
     chart.guide().text({
@@ -187,8 +187,8 @@ export default class extends Vue {
       position: [-32, "max"],
       content: "适应型:经验实干型",
       style: {
-        fill: "red",
-        fontSize: container.clientWidth * 0.05
+        fill: "#4d73be",
+        fontSize: container.clientWidth * 0.04
       }
     });
     chart.guide().text({
@@ -196,8 +196,8 @@ export default class extends Vue {
       position: [20, "max"],
       content: "散发型:经验观察型",
       style: {
-        fill: "red",
-        fontSize: container.clientWidth * 0.05
+        fill: "#4d73be",
+        fontSize: container.clientWidth * 0.04
       }
     });
     chart.guide().text({
@@ -205,8 +205,8 @@ export default class extends Vue {
       position: [20, "min"],
       content: "消化型:推论观察型",
       style: {
-        fill: "red",
-        fontSize: container.clientWidth * 0.05
+        fill: "#4d73be",
+        fontSize: container.clientWidth * 0.04
       }
     });
     this.chart = chart;
@@ -214,22 +214,3 @@ export default class extends Vue {
   }
 }
 </script>
-<style lang="scss" scoped>
-.chart-container /deep/ {
-  .chart-label {
-    font-size: 20px;
-    white-space: nowrap;
-    @media (max-width: 900px) {
-      font-size: 12px;
-    }
-  }
-  .placeholder {
-    white-space: nowrap;
-    font-size: 18px;
-    color: red;
-    @media (max-width: 900px) {
-      font-size: 16px;
-    }
-  }
-}
-</style>
