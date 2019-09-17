@@ -1,6 +1,6 @@
 <template>
   <div class="chart-container" ref="container">
-    <canvas :id='name'></canvas>
+    <canvas :id="name"></canvas>
   </div>
 </template>
 <script lang="ts">
@@ -9,7 +9,7 @@ import { Vue, Component, Prop, Watch } from "vue-property-decorator";
 import F2 from "@antv/f2/lib/core";
 import "@antv/f2/lib/geom/point";
 import "@antv/f2/lib/component/guide/line";
-import "@antv/f2/lib/component/guide/html";
+import "@antv/f2/lib/component/guide/text";
 // @ts-ignore
 import Guide from "@antv/f2/lib/plugin/guide";
 // @ts-ignore
@@ -59,7 +59,14 @@ export default class extends Vue {
       height: container.clientWidth,
       plugins: [Guide, Legend],
       appendPadding: 0,
-      padding: this.legend ? container.clientWidth * 0.05 + 40 : 20
+      padding: [
+        this.legend
+          ? container.clientWidth * 0.05 + 60
+          : container.clientWidth * 0.06,
+        container.clientWidth * 0.06,
+        container.clientWidth * 0.06,
+        container.clientWidth * 0.06
+      ]
     });
     chart.source(this.handleData(this.data), {
       x: {
@@ -127,46 +134,80 @@ export default class extends Vue {
         opacity: 0.2
       }
     });
-    chart.guide().html({
+    chart.guide().text({
+      top: false,
       position: ["max", -6],
-      html: '<div class="chart-label">静思<br>观察</div>',
-      alignX: "center"
+      content: "静思\n观察",
+      style: {
+        fill: "#000",
+        fontSize: container.clientWidth * 0.05
+      },
+      limitInPlot: true
     });
-    chart.guide().html({
+    chart.guide().text({
+      top: false,
       position: [-6, "min"],
-      html: '<div class="chart-label">抽象<br>概念</div>',
-      alignX: "center"
+      content: "抽象\n概念",
+      style: {
+        fill: "#000",
+        fontSize: container.clientWidth * 0.05
+      },
+      limitInPlot: true
     });
-    chart.guide().html({
+    chart.guide().text({
+      top: false,
       position: ["min", -6],
-      html: '<div class="chart-label">主动<br>体验</div>',
-      alignX: "center"
+      content: "主动\n体验",
+      style: {
+        fill: "#000",
+        fontSize: container.clientWidth * 0.05
+      }
     });
-    chart.guide().html({
+    chart.guide().text({
+      top: false,
       position: [-6, "max"],
-      html: '<div class="chart-label">具体<br>经验</div>',
-      alignX: "center"
+      content: "具体\n经验",
+      style: {
+        fill: "#000",
+        fontSize: container.clientWidth * 0.05
+      }
     });
     // 四象限文字
-    chart.guide().html({
-      position: [-32, 'min'],
-      html: '<div class="placeholder">归纳型:推论实干型</div>',
-      alignX: "center"
+    chart.guide().text({
+      top: false,
+      position: [-32, "min"],
+      content: "归纳型:推论实干型",
+      style: {
+        fill: "red",
+        fontSize: container.clientWidth * 0.05
+      }
     });
-    chart.guide().html({
-      position: [-32, 'max'],
-      html: '<div class="placeholder">适应型:经验实干型</div>',
-      alignX: "center"
+    chart.guide().text({
+      top: false,
+      position: [-32, "max"],
+      content: "适应型:经验实干型",
+      style: {
+        fill: "red",
+        fontSize: container.clientWidth * 0.05
+      }
     });
-    chart.guide().html({
-      position: [20, 'max'],
-      html: '<div class="placeholder">散发型:经验观察型</div>',
-      alignX: "center"
+    chart.guide().text({
+      top: false,
+      position: [20, "max"],
+      content: "散发型:经验观察型",
+      style: {
+        fill: "red",
+        fontSize: container.clientWidth * 0.05
+      }
     });
-    chart.guide().html({
-      position: [20, 'min'],
-      html: '<div class="placeholder">消化型:推论观察型</div>',
-      alignX: "center"
+    chart.guide().text({
+      top: false,
+      position: [20, "min"],
+      content: "消化型:推论观察型",
+      style: {
+        fill: "red",
+        fontSize: container.clientWidth * 0.05
+      }
     });
     this.chart = chart;
     chart.render();
