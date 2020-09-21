@@ -1,32 +1,23 @@
 <template>
   <div class="container" v-loading.fullscreen="loading">
     <template v-if="!loading">
-      <h3>{{index + 1}}. {{title}}</h3>
+      <h3>{{title}} ({{index + 1}}/{{total}})</h3>
+      <p class="tip success">
+        <i class="el-icon-top"></i>最像我
+      </p>
       <el-row type="flex">
-        <draggable
-          :animation="200"
-          :list="curAnswer"
-          tag="ul"
-          class="option answer"
-          :class="{empty}"
-          group="answer"
-        >
-          <li v-for="item in curAnswer" :key="item.label">{{item.label}}</li>
+        <draggable :animation="200" :list="curAnswer" tag="ul" class="option answer">
+          <li v-for="item in curAnswer" :key="item.label">
+            <span>{{item.label}}</span>
+            <img height="20" src="@/assets/drag.svg" />
+          </li>
         </draggable>
-        <img src="@/assets/arrow.svg" />
       </el-row>
-      <p v-if="cloneOtions.length">标签:</p>
-      <div>
-        <draggable tag="ul" :list="cloneOtions" :sort="false" class="option" group="answer">
-          <li v-for="item in cloneOtions" :key="item.label">{{item.label}}</li>
-        </draggable>
-      </div>
-      <el-button
-        type="primary"
-        class="submit"
-        :disabled="disabled"
-        @click="onSubmit"
-      >{{last ? '完成测试': '下一题'}}</el-button>
+      <p class="tip danger">
+        <i class="el-icon-bottom"></i>最不像我
+      </p>
+      <el-button class="submit" plain :disabled="first" @click="index--">上一题</el-button>
+      <el-button type="primary" @click="onSubmit">{{last ? '完成测试': '下一题'}}</el-button>
     </template>
   </div>
 </template>
@@ -61,16 +52,11 @@ export default class extends Vue {
     return this.answer[this.index];
   }
 
-  get empty() {
-    return !this.curAnswer || !this.curAnswer.length;
-  }
-
-  get disabled() {
-    return !this.curAnswer || this.curAnswer.length < this.options.length;
-  }
-
   get last() {
     return this.index === this.total - 1;
+  }
+  get first() {
+    return this.index === 0;
   }
   answer: any[] = [];
   config: any = {};
@@ -91,13 +77,25 @@ export default class extends Vue {
           result[item.type] += answer.length - i;
         });
       });
-      await axios.post("/api/complete", {
-        name: this.$route.query.name,
-        ...result
-      });
+      await axios.post(
+        "/api/complete",
+        {
+          name: this.$route.query.name,
+          group: this.$route.query.group,
+          ...result
+        },
+        {
+          params: {
+            token: this.$route.query.token
+          }
+        }
+      );
       this.$router.push({
         path: "/result",
-        query: result
+        query: {
+          ...result,
+          name: this.$route.query.name
+        }
       });
     }
   }
@@ -109,11 +107,10 @@ export default class extends Vue {
       });
       this.config = data;
       for (let i = 0; i < this.total; i++) {
-        this.answer.push([]);
+        this.answer.push(this.config[Object.keys(this.config)[i]]);
       }
       this.loading = false;
     } catch (e) {
-      await this.$alert("请重新扫描二维码", "信息请求失败");
       this.$router.back();
     }
   }
@@ -134,10 +131,16 @@ export default class extends Vue {
 .option {
   list-style: none;
   padding: 0;
+  margin: 5px 0;
   li {
     padding: 12px;
     border: 1px solid #efefef;
     background: #fff;
+    display: flex;
+    span {
+      flex: 1;
+    }
+    align-items: center;
   }
   li + li {
     border-top: 0;
@@ -145,22 +148,26 @@ export default class extends Vue {
 }
 .answer {
   flex: 1;
-  min-height: 300px;
-
-  position: relative;
-  background-color: #f7f7f7;
-  margin-right: 20px;
-  &.empty::after {
-    content: "将下方标签拖入此区域";
-    color: #bcbcbc;
-    position: absolute;
-    width: 100%;
-    top: 50%;
-    transform: translateY(-50%);
-    text-align: center;
-  }
 }
 .flip-list-move {
   transition: transform 0.5s;
+}
+.tip {
+  margin: 0;
+  text-align: center;
+  &.success {
+    color: #67c23a;
+  }
+  &.danger {
+    color: #f56c6c;
+    margin-bottom: 20px;
+  }
+}
+.el-button {
+  margin-left: 0;
+  margin-right: 0;
+  & + & {
+    margin-top: 16px;
+  }
 }
 </style>
